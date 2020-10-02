@@ -1,4 +1,5 @@
 import path from 'path';
+import fetch from 'isomorphic-fetch';
 
 async function turnPizzasIntoPages({ graphql, actions }) {
   // get a template for this page
@@ -30,7 +31,6 @@ async function turnPizzasIntoPages({ graphql, actions }) {
 }
 
 async function turnToppingsIntoPages({ graphql, actions }) {
-  console.log('turning the toppings into pages');
   // get tempalte
   const toppingTemplate = path.resolve('./src/pages/pizzas.js');
   // query all the toppings
@@ -46,7 +46,6 @@ async function turnToppingsIntoPages({ graphql, actions }) {
   `);
   // createpage for that topping
   data.toppings.nodes.forEach((topping) => {
-    console.log('creating pages', topping.name);
     actions.createPage({
       path: `topping/${topping.name}`,
       component: toppingTemplate,
@@ -59,7 +58,41 @@ async function turnToppingsIntoPages({ graphql, actions }) {
   });
   // pass topping data to pizza
 }
+async function fetchBeerandTurnIntoNodes({
+  actions,
+  createNodeId,
+  createContentDigest,
+}) {
+  // fetch list of beers
+  const res = await fetch('https://sampleapis.com/beers/api/ale');
+  const beers = await res.json();
 
+  // loop over each one
+  for (const beer of beers) {
+    // create node for each beet
+    const nodeMeta = {
+      id: createNodeId(`beer-${beer.name}`),
+      parent: null,
+      children: [],
+      internal: {
+        type: 'Beer',
+        mediaType: 'application/json',
+        contentDigest: createContentDigest(beer),
+      },
+    };
+    // create a node for that beer
+    actions.createNode({
+      ...beer,
+      ...nodeMeta,
+    });
+  }
+}
+export async function sourceNodes(params) {
+  // fetch a list of beers and source them into our gatsby api!
+  await Promise.all([fetchBeerandTurnIntoNodes(params)]);
+}
+
+// Create pages
 export async function createPages(params) {
   // Create pages dynamically
   // Pizza
@@ -68,7 +101,6 @@ export async function createPages(params) {
     turnPizzasIntoPages(params),
     turnToppingsIntoPages(params),
   ]);
-
   // Toppings
   // slicemasters
 }
