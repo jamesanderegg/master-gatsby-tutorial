@@ -43,7 +43,7 @@ export default function SliceMaster({ data }) {
     <>
       <SlicemasterGrid>
         {slicemasters.map((person) => (
-          <SlicemasterStyles>
+          <SlicemasterStyles key={person.id}>
             <Link to={`/slicemaster/${person.slug.current}`}>
               <h2>
                 <span className="mark">{person.name}</span>
@@ -59,8 +59,8 @@ export default function SliceMaster({ data }) {
 }
 
 export const query = graphql`
-  query {
-    slicemasters: allSanityPerson {
+  query($skip: Int = 0, $pageSize: Int = 2) {
+    slicemasters: allSanityPerson(limit: $pageSize, skip: $skip) {
       totalCount
       nodes {
         name
