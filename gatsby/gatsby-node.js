@@ -2,9 +2,9 @@ import path, { resolve } from 'path';
 import fetch from 'isomorphic-fetch';
 
 async function turnPizzasIntoPages({ graphql, actions }) {
-  // get a template for this page
-  const pizzaTemplate = path.resolve('./src/templates/Pizzas.js');
-  // query all pizzas
+  // 1. Get a template for this page
+  const pizzaTemplate = path.resolve('./src/templates/Pizza.js');
+  // 2. Query all pizzas
   const { data } = await graphql(`
     query {
       pizzas: allSanityPizza {
@@ -17,10 +17,10 @@ async function turnPizzasIntoPages({ graphql, actions }) {
       }
     }
   `);
-  // loop over each pizza and create a page for that pizza
+  // 3. Loop over each pizza and create a page for that pizza
   data.pizzas.nodes.forEach((pizza) => {
     actions.createPage({
-      // what is the url for the new page
+      // What is the URL for this new page??
       path: `pizza/${pizza.slug.current}`,
       component: pizzaTemplate,
       context: {
@@ -31,9 +31,9 @@ async function turnPizzasIntoPages({ graphql, actions }) {
 }
 
 async function turnToppingsIntoPages({ graphql, actions }) {
-  // get tempalte
+  // 1. Get the template
   const toppingTemplate = path.resolve('./src/pages/pizzas.js');
-  // query all the toppings
+  // 2. query all the toppings
   const { data } = await graphql(`
     query {
       toppings: allSanityTopping {
@@ -44,32 +44,32 @@ async function turnToppingsIntoPages({ graphql, actions }) {
       }
     }
   `);
-  // createpage for that topping
+  // 3. createPage for that topping
   data.toppings.nodes.forEach((topping) => {
     actions.createPage({
       path: `topping/${topping.name}`,
       component: toppingTemplate,
       context: {
         topping: topping.name,
-        // todo regex
+        // TODO Regex for Topping
         toppingRegex: `/${topping.name}/i`,
       },
     });
   });
-  // pass topping data to pizza
+  // 4. Pass topping data to pizza.js
 }
-async function fetchBeerandTurnIntoNodes({
+
+async function fetchBeersAndTurnIntoNodes({
   actions,
   createNodeId,
   createContentDigest,
 }) {
-  // fetch list of beers
+  // 1. Fetch a  list of beers
   const res = await fetch('https://sampleapis.com/beers/api/ale');
   const beers = await res.json();
-
-  // loop over each one
+  // 2. Loop over each one
   for (const beer of beers) {
-    // create node for each beet
+    // create a node for each beer
     const nodeMeta = {
       id: createNodeId(`beer-${beer.name}`),
       parent: null,
@@ -80,7 +80,7 @@ async function fetchBeerandTurnIntoNodes({
         contentDigest: createContentDigest(beer),
       },
     };
-    // create a node for that beer
+    // 3. Create a node for that beer
     actions.createNode({
       ...beer,
       ...nodeMeta,
@@ -89,7 +89,7 @@ async function fetchBeerandTurnIntoNodes({
 }
 
 async function turnSlicemastersIntoPages({ graphql, actions }) {
-  // query all slicemasters
+  // 1. Query all slicemasters
   const { data } = await graphql(`
     query {
       slicemasters: allSanityPerson {
@@ -104,8 +104,7 @@ async function turnSlicemastersIntoPages({ graphql, actions }) {
       }
     }
   `);
-
-  // turn each slicemaster into their own page
+  // TODO: 2. Turn each slicemaster into their own page (TODO)
   data.slicemasters.nodes.forEach((slicemaster) => {
     actions.createPage({
       component: resolve('./src/templates/Slicemaster.js'),
@@ -116,19 +115,21 @@ async function turnSlicemastersIntoPages({ graphql, actions }) {
       },
     });
   });
-  // figure out how many pages there are based on how many slicemasers there are, and how many per page
+
+  // 3. Figure out how many pages there are based on how many slicemasters there are, and how many per page!
   const pageSize = parseInt(process.env.GATSBY_PAGE_SIZE);
   const pageCount = Math.ceil(data.slicemasters.totalCount / pageSize);
 
-  // loop from 1 to number of pages
+  // 4. Loop from 1 to n and create the pages for them
   Array.from({ length: pageCount }).forEach((_, i) => {
+    console.log(`Creating page ${i}`);
     actions.createPage({
       path: `/slicemasters/${i + 1}`,
       component: path.resolve('./src/pages/slicemasters.js'),
-      // this data is passed to the tempate when we create it
+      // This data is pass to the template when we create it
       context: {
         skip: i * pageSize,
-        current: i + 1,
+        currentPage: i + 1,
         pageSize,
       },
     });
@@ -136,21 +137,19 @@ async function turnSlicemastersIntoPages({ graphql, actions }) {
 }
 
 export async function sourceNodes(params) {
-  // fetch a list of beers and source them into our gatsby api!
-  await Promise.all([fetchBeerandTurnIntoNodes(params)]);
+  // fetch a list of beers and source them into our gatsby API!
+  await Promise.all([fetchBeersAndTurnIntoNodes(params)]);
 }
 
-// Create pages
 export async function createPages(params) {
   // Create pages dynamically
-
-  // Wait for all promisies to be resolved before finish this function
+  // Wait for all promises to be resolved before finishing this function
   await Promise.all([
     turnPizzasIntoPages(params),
     turnToppingsIntoPages(params),
     turnSlicemastersIntoPages(params),
   ]);
-  // Pizza
-  // Toppings
-  // slicemasters
+  // 1. Pizzas
+  // 2. Toppings
+  // 3. Slicemasters
 }
