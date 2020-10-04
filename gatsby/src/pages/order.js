@@ -1,5 +1,5 @@
 import { graphql } from 'gatsby';
-import React, { useState } from 'react';
+import React from 'react';
 import Img from 'gatsby-image';
 import SEO from '../components/SEO';
 import useForm from '../utils/useForm';
