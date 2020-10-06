@@ -4,7 +4,7 @@ export default function useLatestData() {
   // hotslices
   const [hotSlices, setHotSlices] = useState();
   // slicemasters
-  const [sliceMasters, setSliceMasters] = useState();
+  const [slicemasters, setSliceMasters] = useState();
 
   // use a side effect to fetch data from sanity graphql endpoint
   useEffect(function () {
@@ -34,8 +34,8 @@ export default function useLatestData() {
         // CHECK FOR ERRORS
         // set data to state
         setHotSlices(res.data.StoreSettings.hotSlices);
-        setSliceMasters(res.data.StoreSettings.sliceMaster);
+        setSliceMasters(res.data.StoreSettings.slicemaster);
       });
   }, []);
-  return { hotSlices, sliceMasters };
+  return { hotSlices, slicemasters };
 }
