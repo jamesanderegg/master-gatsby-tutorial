@@ -1,11 +1,11 @@
 import React from 'react';
-import { ItemsGrid, ItemStyle } from '../styles/Grids';
+import { ItemsGrid, ItemStyles } from '../styles/Grids';
 
 export default function LoadingGrid({ count }) {
   return (
     <ItemsGrid>
       {Array.from({ length: count }, (_, i) => (
-        <ItemStyle>
+        <ItemStyles>
           <p>
             <span className="mark"> Loading...</span>
           </p>
@@ -16,7 +16,7 @@ export default function LoadingGrid({ count }) {
             width="500"
             height="400"
           />
-        </ItemStyle>
+        </ItemStyles>
       ))}
     </ItemsGrid>
   );
