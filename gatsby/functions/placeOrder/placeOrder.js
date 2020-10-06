@@ -32,12 +32,19 @@ const transporter = nodemailer.createTransport({
   },
 });
 
+function wait(ms = 0) {
+  return new Promise((resolve, reject) => {
+    setTimeout(resolve, ms);
+  });
+}
+
 exports.handler = async (event, context) => {
+  await wait(2000);
   const body = JSON.parse(event.body);
   console.log(body);
   // validate the data coming in is correct
   const requiredFields = ['email', 'name', 'order'];
-  // using for each will create another function scope
+  // using for each will create another function scope so we dont use
   for (const field of requiredFields) {
     console.log(`Checking ${field}`);
     if (!body[field]) {
@@ -49,7 +56,15 @@ exports.handler = async (event, context) => {
       };
     }
   }
-
+  // make sure they actually have items in the order
+  if (!body.order.length) {
+    return {
+      statusCode: 400,
+      body: JSON.stringify({
+        message: `Why would you order nothing?!`,
+      }),
+    };
+  }
   // send the email
 
   // send the succerss or error message
