@@ -8,7 +8,6 @@ import useLatestData from '../utils/useLatestData';
 // So we must use the sanity API, client side, graphql endpoint to fetch the data
 
 function CurrentlySlicing({ slicemasters }) {
-  console.log(slicemasters);
   return (
     <div>
       <h2 className="center">

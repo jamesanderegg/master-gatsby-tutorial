@@ -50,12 +50,11 @@ exports.handler = async (event, context) => {
       }),
     };
   }
-  console.log(body);
+
   // validate the data coming in is correct
   const requiredFields = ['email', 'name', 'order'];
   // using for each will create another function scope so we dont use
   for (const field of requiredFields) {
-    console.log(`Checking ${field}`);
     if (!body[field]) {
       return {
         statusCode: 400,
